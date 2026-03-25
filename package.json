@@ -1,0 +1,44 @@
+{
+  "name": "testpilot",
+  "version": "1.0.0",
+  "description": "Local AI Test Generator",
+  "main": "dist/index.js",
+  "bin": {
+    "testpilot": "./dist/bin/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/bin/index.ts",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atreyakamat/test-case-generator.git"
+  },
+  "keywords": [
+    "ai",
+    "testing",
+    "cli"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/atreyakamat/test-case-generator/issues"
+  },
+  "homepage": "https://github.com/atreyakamat/test-case-generator#readme",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "chromadb": "^3.4.0",
+    "commander": "^14.0.3",
+    "glob": "^13.0.6",
+    "ignore": "^7.0.5",
+    "ollama": "^0.6.3",
+    "ora": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/node": "^25.5.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.2"
+  }
+}
