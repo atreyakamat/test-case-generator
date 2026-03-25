@@ -7,7 +7,7 @@ import path from 'path';
 import { checkOllama } from '../utils';
 import { scanCodebase, readPRD } from '../scanner';
 import { chunkFile, CodeChunk } from '../chunker';
-import { initRAG, upsertChunksToChroma } from '../rag';
+import { initRAG, upsertChunksToStore } from '../rag';
 import { generateTests } from '../generator';
 
 const program = new Command();
@@ -77,14 +77,14 @@ async function runPipeline(baseDir: string, prdPath?: string, targetFile?: strin
   }
   spinner.succeed(chalk.green(`Extracted ${allChunks.length} logical chunks (functions/classes).`));
 
-  // Initialize RAG / Chroma
-  spinner.start('Initializing local Vector DB (ChromaDB)...');
-  const collection = await initRAG();
-  spinner.succeed(chalk.green('ChromaDB collection initialized.'));
+  // Initialize RAG / Memory Store
+  spinner.start('Initializing Local Vector Engine...');
+  const store = await initRAG();
+  spinner.succeed(chalk.green('Vector engine initialized.'));
 
   // Embeddings
-  spinner.start('Generating embeddings for context...\\n');
-  await upsertChunksToChroma(collection, allChunks, (msg) => {
+  spinner.start('Generating embeddings for context...\n');
+  await upsertChunksToStore(store, allChunks, (msg) => {
     spinner.text = msg;
   });
   spinner.succeed(chalk.green('Codebase vectorized successfully.'));
@@ -92,17 +92,17 @@ async function runPipeline(baseDir: string, prdPath?: string, targetFile?: strin
   // Filter chunks if targetFile is provided
   let chunksToProcess = allChunks;
   if (targetFile) {
-    const targetPath = path.normalize(targetFile).replace(/\\\\/g, '/');
-    chunksToProcess = allChunks.filter(c => c.filePath.replace(/\\\\/g, '/').includes(targetPath));
+    const targetPath = path.normalize(targetFile).replace(/\\/g, '/');
+    chunksToProcess = allChunks.filter(c => c.filePath.replace(/\\/g, '/').includes(targetPath));
     if (chunksToProcess.length === 0) {
-      console.log(chalk.yellow(`\\n⚠️ No code chunks found in the target file: ${targetFile}`));
+      console.log(chalk.yellow(`\n⚠️ No code chunks found in the target file: ${targetFile}`));
       process.exit(0);
     }
   }
 
   // Generation
-  console.log(chalk.magenta.bold('\\n🧠 Generating Tests...'));
-  await generateTests(chunksToProcess, collection, prdContent, baseDir, (msg) => {
+  console.log(chalk.magenta.bold('\n🧠 Generating Tests...'));
+  await generateTests(chunksToProcess, store, prdContent, baseDir, (msg) => {
     spinner.start(chalk.blue(msg));
   });
   spinner.succeed(chalk.green('Test generation complete!'));

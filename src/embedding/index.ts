@@ -1,6 +1,6 @@
 import { Ollama } from 'ollama';
 
-const ollama = new Ollama();
+const ollama = new Ollama({ host: 'http://127.0.0.1:11434' });
 
 export async function getEmbedding(text: string): Promise<number[]> {
   try {
@@ -22,6 +22,10 @@ export async function generateText(prompt: string, systemPrompt?: string): Promi
       system: systemPrompt,
     });
     
+    if (!response || typeof response.response !== 'string') {
+       throw new Error(`Unexpected response from Ollama: ${JSON.stringify(response)}`);
+    }
+
     // Clean up markdown wrapping if present
     let result = response.response.trim();
     if (result.startsWith('\`\`\`')) {

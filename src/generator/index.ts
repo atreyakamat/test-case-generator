@@ -1,13 +1,12 @@
 import { CodeChunk } from '../chunker';
-import { Collection } from 'chromadb';
-import { retrieveRelevantContext } from '../rag';
+import { MemoryVectorStore, retrieveRelevantContext } from '../rag';
 import { generateText } from '../embedding';
 import { systemPrompts } from '../prompts';
 import { writeTestFile, writeJestSetup, writeReadme } from '../writer';
 
 export async function generateTests(
   chunks: CodeChunk[],
-  collection: Collection,
+  collection: MemoryVectorStore,
   prdContent: string | null,
   baseDir: string,
   onProgress?: (msg: string) => void

@@ -1,6 +1,6 @@
 import { Ollama } from 'ollama';
 
-const ollama = new Ollama();
+const ollama = new Ollama({ host: 'http://127.0.0.1:11434' });
 
 export async function checkOllama(): Promise<boolean> {
   try {
@@ -19,6 +19,7 @@ export async function checkOllama(): Promise<boolean> {
     if (err.message && err.message.includes('fetch')) {
       throw new Error("Ollama is not running. Please start the Ollama application locally.");
     }
+    console.error('Ollama check failed with:', err);
     throw err;
   }
 }
