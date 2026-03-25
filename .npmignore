@@ -1,0 +1,40 @@
+# .npmignore - Controls what gets published to npm
+
+# Source files (we only want the compiled dist)
+src/
+tsconfig.json
+
+# Development files
+*.log
+*.md
+!README.md
+example-prd.md
+CONTRIBUTING.md
+
+# Git
+.git/
+.gitignore
+
+# CI/CD
+.github/
+
+# Tests
+tests/
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+
+# Build artifacts
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Examples and documentation that aren't needed in the package
+examples/
+docs/
