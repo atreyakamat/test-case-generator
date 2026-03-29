@@ -1,0 +1,13 @@
+{
+  "name": "testpilot-example",
+  "version": "1.0.0",
+  "description": "Example project for TestPilot",
+  "main": "math.js",
+  "type": "module",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

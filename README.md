@@ -1,149 +1,216 @@
-# TestPilot
+# TestPilot 🧪✨
 
-A local AI-powered test generator that uses Ollama and RAG (Retrieval-Augmented Generation) to automatically generate comprehensive test cases for your JavaScript/TypeScript projects.
+**Local AI Test Generator powered by Ollama and RAG**
+
+TestPilot is a CLI tool that automatically generates comprehensive unit tests for your JavaScript/TypeScript codebase using local AI models. It leverages Retrieval Augmented Generation (RAG) with ChromaDB to understand your codebase context and produce high-quality, contextually-aware test cases.
 
 ## Features
 
-- 🤖 **Local AI**: Powered by Ollama - no external API calls or data sharing
-- 🧠 **Context-Aware**: Uses RAG to understand your codebase and generate relevant tests
-- 📦 **Zero Config**: Works out of the box with automatic codebase scanning
-- 🎯 **Smart Generation**: Generates tests for functions, classes, and modules
-- 📝 **PRD Support**: Optionally provide product requirements for context-aware testing
-- ⚡ **Fast**: Processes entire codebases efficiently with chunking and vectorization
+- 🤖 **Local AI-Powered**: Uses Ollama for completely local test generation (no external API calls)
+- 🧠 **Context-Aware**: Employs RAG to understand your entire codebase before generating tests
+- 📦 **Zero Config**: Works out of the box with sensible defaults
+- 🎯 **Flexible**: Generate tests for entire projects or specific files
+- 📝 **PRD Support**: Optionally provide product requirements documents for more context-aware tests
+- ⚡ **Fast**: Efficient chunking and vectorization for quick test generation
 
 ## Prerequisites
 
-1. **Ollama** must be installed and running locally
-   - Download from [ollama.ai](https://ollama.ai)
-   - Start the Ollama application
+Before using TestPilot, you need to have Ollama installed and running locally with the required models:
 
-2. **Required Ollama Models**:
-   ```bash
-   ollama run qwen2.5-coder:3b
-   ollama run nomic-embed-text
-   ```
+### 1. Install Ollama
+
+Download and install Ollama from [https://ollama.ai](https://ollama.ai)
+
+### 2. Pull Required Models
+
+```bash
+# Code generation model (3B parameters, fast and efficient)
+ollama pull qwen2.5-coder:3b
+
+# Embedding model for semantic search
+ollama pull nomic-embed-text
+```
+
+### 3. Start Ollama
+
+Make sure Ollama is running in the background:
+
+```bash
+ollama serve
+```
 
 ## Installation
+
+### Global Installation (Recommended)
 
 ```bash
 npm install -g testpilot
 ```
 
-Or use locally in your project:
+### Local Development
 
 ```bash
-npm install testpilot --save-dev
+git clone https://github.com/atreyakamat/test-case-generator.git
+cd test-case-generator
+npm install
+npm run build
+npm link
 ```
 
 ## Usage
 
-### Initialize and Generate Tests for Entire Project
+### Generate Tests for Entire Project
 
 ```bash
+# Navigate to your project directory
+cd /path/to/your/project
+
+# Generate tests for all source files
 testpilot init
 ```
-
-This will:
-1. Scan your codebase for JS/TS files
-2. Parse and chunk functions/classes
-3. Generate embeddings for context
-4. Create comprehensive test files in the `/tests` directory
-5. Generate a Jest configuration and testing README
 
 ### Generate Tests for a Specific File
 
 ```bash
-testpilot generate <file-path>
+testpilot generate src/utils/helper.ts
 ```
 
-Example:
-```bash
-testpilot generate src/utils/helpers.ts
-```
-
-### Use with PRD Documentation
-
-Provide product requirements or function documentation for more context-aware tests:
+### Using with Product Requirements Document (PRD)
 
 ```bash
+# Provide additional context from a PRD or documentation file
 testpilot init --prd ./docs/requirements.md
-testpilot generate src/auth.ts --prd ./docs/auth-spec.md
+
+# Or for a specific file
+testpilot generate src/api/users.ts --prd ./docs/api-spec.md
 ```
 
 ## How It Works
 
-1. **Scanning**: TestPilot scans your codebase for JavaScript/TypeScript files (excluding node_modules, dist, tests)
-2. **Chunking**: Code is parsed into logical chunks (functions, classes, methods)
-3. **Vectorization**: Each chunk is embedded using `nomic-embed-text` for semantic search
-4. **Context Retrieval**: For each chunk, relevant context is retrieved from the vector store
-5. **Test Generation**: `qwen2.5-coder:3b` generates comprehensive tests using the code and context
-6. **Output**: Tests are written to the `/tests` directory with proper structure
+1. **Ollama Check**: Verifies that Ollama is running and required models are installed
+2. **Codebase Scanning**: Scans your project for JS/TS files (excluding node_modules, dist, tests)
+3. **Code Chunking**: Parses files and extracts logical chunks (functions, classes, methods)
+4. **Vectorization**: Generates embeddings and stores them in a local ChromaDB instance
+5. **Context Retrieval**: For each chunk, retrieves relevant related code using RAG
+6. **Test Generation**: Uses the local AI model to generate comprehensive unit tests
+7. **Test Writing**: Creates organized test files in a `/tests` directory
 
-## Generated Files
+## Generated Output
 
-After running TestPilot, you'll find:
+TestPilot creates the following in your project:
 
-- `/tests/**/*.test.js` - Generated test files mirroring your source structure
-- `jest.config.js` - Jest configuration (if not already present)
-- `README_TESTING.md` - Guide for running and understanding the tests
-
-## Running Generated Tests
-
-```bash
-npm run test
+```
+your-project/
+├── tests/
+│   ├── src/
+│   │   ├── utils/
+│   │   │   └── helper.test.ts
+│   │   └── api/
+│   │       └── users.test.ts
+│   └── ...
+├── jest.config.js          # Jest configuration (if not exists)
+└── README_TESTING.md       # Testing guide and documentation
 ```
 
-Or with Jest directly:
+## What Gets Tested
 
-```bash
-npx jest
-```
+TestPilot generates tests for:
+
+- ✅ **Happy path scenarios**: Normal expected behavior
+- ✅ **Edge cases**: Boundary conditions, empty inputs, special values
+- ✅ **Error cases**: Exception handling, invalid inputs, failure scenarios
+- ✅ **Mock integration**: Automatic mocking of external dependencies
 
 ## Configuration
 
-TestPilot uses sensible defaults and requires no configuration. It automatically:
+### Files Excluded from Scanning
 
-- Ignores `node_modules`, `dist`, `build`, existing test files
-- Detects JS/TS/JSX/TSX files
-- Generates Jest-compatible tests
-- Creates organized test directory structure
+By default, TestPilot ignores:
+- `node_modules/`
+- `dist/`, `build/`
+- `tests/`
+- `**/*.test.*`, `**/*.spec.*`
+- `.git/`
 
-## Architecture
+### Supported File Types
 
-- **Scanner**: Discovers source files using glob patterns
-- **Chunker**: Parses code into testable units
-- **Embedder**: Creates semantic embeddings via Ollama
-- **RAG Engine**: Vector store for context retrieval
-- **Generator**: AI-powered test generation
-- **Writer**: Creates test files and configuration
-
-## Requirements
-
-- Node.js >= 14
-- Ollama running locally
-- Available models: `qwen2.5-coder:3b`, `nomic-embed-text`
+- JavaScript (`.js`, `.jsx`)
+- TypeScript (`.ts`, `.tsx`)
 
 ## Development
 
+### Build from Source
+
 ```bash
-# Clone the repository
-git clone https://github.com/atreyakamat/test-case-generator.git
-cd test-case-generator
-
-# Install dependencies
-npm install
-
-# Build
 npm run build
-
-# Run locally
-npm start
 ```
+
+### Run Locally Without Installing
+
+```bash
+npm start -- init
+npm start -- generate src/example.ts
+```
+
+## Architecture
+
+- **CLI**: Commander.js for command-line interface
+- **Parsing**: AST-based code chunking for accurate function/class extraction
+- **Embeddings**: Ollama's nomic-embed-text for semantic understanding
+- **Vector DB**: ChromaDB for efficient similarity search
+- **Generation**: Qwen 2.5 Coder for test code generation
+- **RAG**: Retrieves top-3 most relevant code chunks for context
+
+## Requirements
+
+- Node.js 16+
+- Ollama running locally
+- At least 4GB RAM (for running the AI models)
+- 8GB disk space (for models and embeddings)
+
+## Troubleshooting
+
+### "Ollama is not running"
+
+Make sure Ollama is started:
+```bash
+ollama serve
+```
+
+### "Model not installed"
+
+Pull the required models:
+```bash
+ollama pull qwen2.5-coder:3b
+ollama pull nomic-embed-text
+```
+
+### Tests Don't Run
+
+Make sure Jest is installed:
+```bash
+npm install --save-dev jest @types/jest ts-jest
+```
+
+Run the generated tests:
+```bash
+npm test
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
 ISC
 
-## Contributing
+## Author
 
-Issues and pull requests are welcome at [GitHub](https://github.com/atreyakamat/test-case-generator).
+Created with ❤️ for developers who want comprehensive test coverage without the manual effort.
+
+## Acknowledgments
+
+- [Ollama](https://ollama.ai) - Local LLM inference
+- [ChromaDB](https://www.trychroma.com/) - Vector database
+- [Qwen2.5-Coder](https://github.com/QwenLM/Qwen2.5-Coder) - Code generation model
