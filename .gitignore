@@ -4,4 +4,3 @@ dist/
 *.log
 tests/
 jest.config.js
-README_TESTING.md
