@@ -20,8 +20,15 @@
     "testing",
     "cli"
   ],
-  "author": "",
+  "author": "Atreya Kamat",
   "license": "ISC",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "bugs": {
     "url": "https://github.com/atreyakamat/test-case-generator/issues"
   },
